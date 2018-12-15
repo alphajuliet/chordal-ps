@@ -3,9 +3,11 @@
 
 module Chordal where
 
-import Prelude
+import Prelude (($))
+import Data.Array (elem, findIndex)
+import Data.Maybe (Maybe)
+import Data.String (toUpper)
 -- import Data.List (List)
--- import Data.Maybe
 
 -- -------------------------------
 -- Vocabulary of note names
@@ -26,6 +28,10 @@ allNotes = [
   ["B"] 
 ]
 
+-- Conversion functions
+-- noteToNum :: String -> Array (Array String) -> Maybe Int
+noteToNum :: String -> Array (Array String) -> Maybe Int
+noteToNum e = findIndex (elem $ toUpper e) 
 
 -- -------------------------------
 -- Chord type
