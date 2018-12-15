@@ -6,7 +6,7 @@ import Prelude
 import Effect (Effect)
 import Effect.Console (log)
 
-import Chordal
+import Chordal (allNotes)
 
 main :: Effect Unit
 main = do
