@@ -10,11 +10,12 @@ import Test.Unit.Main (runTest)
 import Test.Unit.Assert as Assert
 
 import Chordal (allNotes, allChords, noteToNum, numToNote, transpose,
-rotateLeft, findChordByName)
+rotateLeft, findChordByName, getChord)
 
 main :: Effect Unit
 main = runTest do
   suite "Unit tests" do
+
     test "Sanity check" do
         Assert.assert "2+2=4" $ (2 + 2) == 4
 
@@ -36,6 +37,11 @@ main = runTest do
          Just { name: ["dim7", "dim7th"], notes: [0, 3, 6, 9], description: "diminished 7th (C-E♭-G♭-B♭♭)" }
        Assert.assert "findChordByName" $ (findChordByName "abc" allChords) ==
          Nothing
+
+    test "Get chord notes" do
+       let opts = { transpose: 0 }
+       Assert.assert "getChord" $ (getChord "min7" allChords opts) ==
+         Just [0, 3, 7, 10]
 
 
 -- The End

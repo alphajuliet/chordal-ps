@@ -9,6 +9,7 @@
     "lists",
     "prelude",
     "psci-support",
+    "record",
     "strings",
     "test-unit"
   ]

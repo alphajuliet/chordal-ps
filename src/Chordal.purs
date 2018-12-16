@@ -3,11 +3,12 @@
 
 module Chordal where
 
-import Prelude (($), (+), (-), mod)
-import Data.Array (length, concat, take, takeEnd, elem, findIndex, index, find)
+import Prelude (($), (+), (-), (<>), mod)
+import Data.Array (length, take, takeEnd, elem, findIndex, index, find)
 import Data.Maybe (Maybe)
 import Data.String (toUpper)
--- import Data.List (List)
+import Record (get)
+import Data.Functor (map)
 
 -- -------------------------------
 -- Vocabulary of note names
@@ -45,7 +46,7 @@ transpose n root = mod (root + n) 12
 rotateLeft :: ∀ a. Int -> Array a -> Array a
 rotateLeft 0 lst = lst
 rotateLeft _ [] = []
-rotateLeft n lst = concat [ (takeEnd (len - nmod) lst), (take nmod lst) ]
+rotateLeft n lst = (takeEnd (len - nmod) lst) <> (take nmod lst)
   where len = length lst
         nmod = mod n len
 
@@ -91,6 +92,15 @@ allChords = [
 
 -- -------------------------------
 findChordByName :: String -> Array Chord -> Maybe Chord
-findChordByName ch lst = find (\x -> ch `elem` x.name) lst
+findChordByName ch = find $ \x -> ch `elem` x.name 
+
+-- -------------------------------
+type Options = {
+  transpose :: Int
+}
+
+-- -------------------------------
+getChord :: String -> Array Chord -> Options -> Maybe (Array Int)
+getChord ch chords opts = map _.notes $ findChordByName ch chords
 
 -- The End
