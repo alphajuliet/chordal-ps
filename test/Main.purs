@@ -9,7 +9,8 @@ import Test.Unit (suite, test)
 import Test.Unit.Main (runTest)
 import Test.Unit.Assert as Assert
 
-import Chordal (allNotes, allChords, noteToNum, numToNote, transpose, findChordByName)
+import Chordal (allNotes, allChords, noteToNum, numToNote, transpose,
+rotateLeft, findChordByName)
 
 main :: Effect Unit
 main = runTest do
@@ -26,6 +27,9 @@ main = runTest do
     test "Other note functions" do
        Assert.assert "transpose" $ (transpose 1 2) == 3
        Assert.assert "transpose" $ (transpose 11 2) == 1
+       Assert.assert "rotateLeft 0" $ (rotateLeft 0 [1, 2, 3]) == [1, 2, 3]
+       Assert.assert "rotateLeft 1" $ (rotateLeft 1 [1, 2, 3]) == [2, 3, 1]
+       Assert.assert "rotateLeft 4" $ (rotateLeft 4 [1, 2, 3]) == [2, 3, 1]
 
     test "Find chord by name" do
        Assert.assert "findChordByName" $ (findChordByName "dim7" allChords) ==

@@ -3,8 +3,8 @@
 
 module Chordal where
 
-import Prelude (($), (+), mod)
-import Data.Array (elem, findIndex, index, find)
+import Prelude (($), (+), (-), mod)
+import Data.Array (length, concat, take, takeEnd, elem, findIndex, index, find)
 import Data.Maybe (Maybe)
 import Data.String (toUpper)
 -- import Data.List (List)
@@ -41,6 +41,13 @@ numToNote n lst = index lst (mod n 12)
 
 transpose :: Int -> Int -> Int
 transpose n root = mod (root + n) 12
+
+rotateLeft :: ∀ a. Int -> Array a -> Array a
+rotateLeft 0 lst = lst
+rotateLeft _ [] = []
+rotateLeft n lst = concat [ (takeEnd (len - nmod) lst), (take nmod lst) ]
+  where len = length lst
+        nmod = mod n len
 
 -- -------------------------------
 -- Chord type
@@ -82,6 +89,7 @@ allChords = [
 	{ name: ["minmaj9"], notes: [0, 3, 7, 11, 14], description: "minor/major 9th (C-E♭-G-B-D)" }
 ]
 
+-- -------------------------------
 findChordByName :: String -> Array Chord -> Maybe Chord
 findChordByName ch lst = find (\x -> ch `elem` x.name) lst
 
