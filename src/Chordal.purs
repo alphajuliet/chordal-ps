@@ -1,4 +1,4 @@
--- Chordal.js
+-- Chordal.purs
 -- AndrewJ 2018-12-12
 
 module Chordal where
@@ -125,9 +125,10 @@ type Options = {
 }
 
 -- -------------------------------
-getChord :: String -> Array Chord -> Maybe (Array String)
-getChord ch chords = 
-  map (mapChord identity >>> (map $ collapseNotes "C")) chord
+getChord :: String -> Array Chord -> Options -> Maybe (Array String)
+getChord ch chords opts = 
+  map ((mapChord $ transpose tr) >>> (map $ collapseNotes "C")) chord
       where chord = findChordByName ch chords
+            tr = opts.transpose :: Int
 
 -- The End
