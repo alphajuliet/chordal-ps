@@ -3,12 +3,12 @@
 
 module Chordal where
 
-import Prelude (($), (+), (-), (<>), (==), (&&), otherwise, mod)
-import Data.Array (length, take, drop, takeEnd, elem, head, last, findIndex, index, find)
+import Prelude (($), (+), (-), (<>), (==), (&&), otherwise, mod, identity)
+import Data.Array (length, take, takeEnd, elem, head, last, findIndex, index, find)
 import Data.Maybe (Maybe, fromMaybe)
 import Data.String as S
 import Data.Functor (map)
-import Control.Semigroupoid ((<<<))
+import Control.Semigroupoid ((<<<), (>>>))
 
 -- -------------------------------
 -- Utilities
@@ -110,13 +110,24 @@ findChordByName :: String -> Array Chord -> Maybe Chord
 findChordByName ch = find $ \x -> ch `elem` x.name 
 
 -- -------------------------------
+-- Map a function over the notes in a given chord
+-- e.g. mapChord (transpose 2) { notes:... } → [["D"], ["F#", "Gb"], ["A"]]
+
+mapChord :: (Int -> Int) -> Chord -> Array (Array String)
+mapChord f = 
+  _.notes 
+  >>> map f 
+  >>> map (numToNote allNotes)
+
+-- -------------------------------
 type Options = {
   transpose :: Int
 }
 
 -- -------------------------------
-{-- getChord :: String -> Array Chord -> Options -> Maybe (Array String) --}
-{-- getChord ch chords opts = map numToNote notes --}
-{--   where notes = map _.notes $ findChordByName ch chords --}
+getChord :: String -> Array Chord -> Maybe (Array String)
+getChord ch chords = 
+  map (mapChord identity >>> (map $ collapseNotes "C")) chord
+      where chord = findChordByName ch chords
 
 -- The End

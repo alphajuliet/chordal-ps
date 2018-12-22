@@ -46,9 +46,9 @@ main = runTest do
        assert "findChordByName" $ map _.notes x == Just [0, 3, 6, 9]
        assert "findChordByName" $ (findChordByName "abc" allChords) == Nothing
 
-    {-- test "Get chord notes" do --}
-    {--    let opts = { transpose: 0 } --}
-    {--    assert "getChord" $ (getChord "min7" allChords opts) == Just ["C", "Eb", "G", "Bb"] --}
+    test "Get chord notes" do
+       let opts = { transpose: 0 }
+       assert "getChord" $ (getChord "min7" allChords) == Just ["C", "D#", "G", "A#"]
 
 
 -- The End
