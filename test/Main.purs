@@ -35,7 +35,8 @@ main = runTest do
        assert "numToNote 14" $ (numToNote allNotes 15) == ["D#", "Eb"]
 
        assert "collapseNotes" $ (collapseNotes "C" ["C#", "Db"]) == "C#"
-       assert "collapseNotes" $ (collapseNotes "Db" ["C#", "Db"]) == "Db"
+       assert "collapseNotes" $ (collapseNotes "C#" ["C#", "Db"]) == "C#"
+       assert "collapseNotes" $ (collapseNotes "Eb" ["C#", "Db"]) == "Db"
 
     test "Other note functions" do
        assert "transpose" $ (transpose 1 2) == 3
@@ -53,8 +54,10 @@ main = runTest do
 
     test "Get chord notes" do
        let opts = { transpose: 2 } :: Options
-       assert "getChord" $ (getChord "min7" allChords opts) == Just ["D", "F", "A", "C"]
-       assert "getChord" $ (getChord "abcd" allChords opts) == Nothing
+       assert "getChord C_abcd" $ (getChord "C" "abcd" opts) == Nothing
+       assert "getChord C_min7" $ (getChord "C" "min7" opts) == Just ["D", "F", "A", "C"]
+       assert "getChord D#_min7" $ (getChord "D#" "min7" opts) == Just ["F", "G#", "C", "D#"]
+       assert "getChord Eb_min7" $ (getChord "Eb" "min7" opts) == Just ["F", "Ab", "C", "Eb"]
 
 
 -- The End

@@ -125,10 +125,11 @@ type Options = {
 }
 
 -- -------------------------------
-getChord :: String -> Array Chord -> Options -> Maybe (Array String)
-getChord ch chords opts = 
-  map ((mapChord $ transpose tr) >>> (map $ collapseNotes "C")) chord
-      where chord = findChordByName ch chords
-            tr = opts.transpose :: Int
+getChord :: String -> String -> Options -> Maybe (Array String)
+getChord root ch opts = 
+  map ((mapChord $ transpose (tr + rootNum)) >>> (map $ collapseNotes root)) chord
+  where chord = findChordByName ch allChords :: Maybe Chord
+        tr = opts.transpose
+        rootNum = fromMaybe 0 (noteToNum root allNotes)
 
 -- The End
