@@ -3,12 +3,18 @@
 
 module Chordal where
 
-import Prelude (($), (+), (-), (<>), mod)
-import Data.Array (length, take, takeEnd, elem, findIndex, index, find)
-import Data.Maybe (Maybe)
-import Data.String (toUpper)
-import Record (get)
+import Prelude (($), (+), (-), (<>), (==), (&&), otherwise, mod)
+import Data.Array (length, take, drop, takeEnd, elem, head, last, findIndex, index, find)
+import Data.Maybe (Maybe, fromMaybe)
+import Data.String as S
 import Data.Functor (map)
+import Control.Semigroupoid ((<<<))
+
+-- -------------------------------
+-- Utilities
+
+capitalise :: String -> String
+capitalise s = (S.toUpper $ S.take 1 s) <> (S.drop 1 s)
 
 -- -------------------------------
 -- Vocabulary of note names
@@ -32,11 +38,20 @@ allNotes = [
 -- Conversion functions
 
 noteToNum :: String -> Array (Array String) -> Maybe Int
-noteToNum e = findIndex (elem $ toUpper e) 
+noteToNum e = findIndex (elem $ capitalise e) 
 
-numToNote :: Int -> Array (Array String) -> Maybe (Array String)
-numToNote n lst = index lst (mod n 12)
+-- This could return a Maybe but doesn't because every Int will map to a
+-- note, modulo the length of the list.
+numToNote :: Array (Array String) -> Int -> Array String
+numToNote lst n = fromMaybe ["C"] $ index lst (mod n len)
+  where len = length lst
 
+-- Choose the right option for black notes based on the root note
+-- e.g. C# => D#, F#... but Db => Eb, Gb...
+collapseNotes :: String -> Array String -> String
+collapseNotes base lst = fromMaybe "" x
+  where x | (S.length base) == 2 && (S.drop 1 base == "b") = last lst
+          | otherwise = head lst
 
 -- Other note functions
 
@@ -100,7 +115,8 @@ type Options = {
 }
 
 -- -------------------------------
-getChord :: String -> Array Chord -> Options -> Maybe (Array Int)
-getChord ch chords opts = map _.notes $ findChordByName ch chords
+{-- getChord :: String -> Array Chord -> Options -> Maybe (Array String) --}
+{-- getChord ch chords opts = map numToNote notes --}
+{--   where notes = map _.notes $ findChordByName ch chords --}
 
 -- The End

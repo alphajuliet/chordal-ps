@@ -7,41 +7,48 @@ import Effect (Effect)
 
 import Test.Unit (suite, test)
 import Test.Unit.Main (runTest)
-import Test.Unit.Assert as Assert
+import Test.Unit.Assert (assert)
 
-import Chordal (allNotes, allChords, noteToNum, numToNote, transpose,
-rotateLeft, findChordByName, getChord)
+import Chordal
+
 
 main :: Effect Unit
 main = runTest do
   suite "Unit tests" do
 
     test "Sanity check" do
-        Assert.assert "2+2=4" $ (2 + 2) == 4
+       assert "2+2=4" $ (2 + 2) == 4
+
+    test "Utilities" do
+       assert "capitalise" $ (capitalise "abc") == "Abc"
+       assert "capitalise" $ (capitalise "") == ""
+       assert "capitalise" $ (capitalise "a") == "A"
 
     test "Conversion functions" do
-       Assert.assert "noteToNum" $ (noteToNum "D" allNotes) == Just 2
-       Assert.assert "noteToNum" $ (noteToNum "H" allNotes) == Nothing
-       Assert.assert "numToNote" $ (numToNote 2 allNotes) == Just ["D"]
-       Assert.assert "numToNote" $ (numToNote 14 allNotes) == Just ["D"]
+       assert "noteToNum D"  $ (noteToNum "D" allNotes) == Just 2
+       assert "noteToNum Eb" $ (noteToNum "Eb" allNotes) == Just 3
+       assert "noteToNum H"  $ (noteToNum "H" allNotes) == Nothing
+       assert "numToNote 2"  $ (numToNote allNotes 2) == ["D"]
+       assert "numToNote 14" $ (numToNote allNotes 15) == ["D#", "Eb"]
+       assert "collapseNotes" $ (collapseNotes "C" ["C#", "Db"]) == "C#"
+       assert "collapseNotes" $ (collapseNotes "Db" ["C#", "Db"]) == "Db"
 
     test "Other note functions" do
-       Assert.assert "transpose" $ (transpose 1 2) == 3
-       Assert.assert "transpose" $ (transpose 11 2) == 1
-       Assert.assert "rotateLeft 0" $ (rotateLeft 0 [1, 2, 3]) == [1, 2, 3]
-       Assert.assert "rotateLeft 1" $ (rotateLeft 1 [1, 2, 3]) == [2, 3, 1]
-       Assert.assert "rotateLeft 4" $ (rotateLeft 4 [1, 2, 3]) == [2, 3, 1]
+       assert "transpose" $ (transpose 1 2) == 3
+       assert "transpose" $ (transpose 11 2) == 1
+       assert "rotateLeft 0" $ (rotateLeft 0 [1, 2, 3]) == [1, 2, 3]
+       assert "rotateLeft 1" $ (rotateLeft 1 [1, 2, 3]) == [2, 3, 1]
+       assert "rotateLeft 4" $ (rotateLeft 4 [1, 2, 3]) == [2, 3, 1]
 
     test "Find chord by name" do
-       Assert.assert "findChordByName" $ (findChordByName "dim7" allChords) ==
-         Just { name: ["dim7", "dim7th"], notes: [0, 3, 6, 9], description: "diminished 7th (C-E♭-G♭-B♭♭)" }
-       Assert.assert "findChordByName" $ (findChordByName "abc" allChords) ==
-         Nothing
+       let x = findChordByName "dim7" allChords
+       assert "findChordByName" $ map _.name x == Just ["dim7", "dim7th"]
+       assert "findChordByName" $ map _.notes x == Just [0, 3, 6, 9]
+       assert "findChordByName" $ (findChordByName "abc" allChords) == Nothing
 
-    test "Get chord notes" do
-       let opts = { transpose: 0 }
-       Assert.assert "getChord" $ (getChord "min7" allChords opts) ==
-         Just [0, 3, 7, 10]
+    {-- test "Get chord notes" do --}
+    {--    let opts = { transpose: 0 } --}
+    {--    assert "getChord" $ (getChord "min7" allChords opts) == Just ["C", "Eb", "G", "Bb"] --}
 
 
 -- The End
