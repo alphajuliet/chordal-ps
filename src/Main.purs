@@ -12,6 +12,6 @@ main :: Effect Unit
 main = do
   log "Chordal"
   log $ show allNotes
-  log $ show $ getChord "D#" "min7" { transpose: 2, invert: 0 }
+  log $ show $ getChord "H" "min7" { transpose: 2, invert: 0 }
 
 -- The End

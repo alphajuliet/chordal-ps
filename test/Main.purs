@@ -5,6 +5,7 @@ module Test.Main where
 
 import Prelude
 import Data.Maybe (Maybe(..))
+import Data.List (head)
 import Effect (Effect)
 
 import Test.Unit (suite, test)
@@ -29,7 +30,7 @@ main = runTest do
     test "Conversion functions" do
        assert "noteToNum D"  $ (noteToNum allNotes "D") == Just 2
        assert "noteToNum Eb" $ (noteToNum allNotes "Eb") == Just 3
-       assert "noteToNum H"  $ (noteToNum allNotes "H") == Nothing
+       assert "noteToNum X"  $ (noteToNum allNotes "X") == Nothing
 
        assert "numToNote 2"  $ (numToNote allNotes 2) == ["D"]
        assert "numToNote 14" $ (numToNote allNotes 15) == ["D#", "Eb"]
@@ -41,6 +42,7 @@ main = runTest do
     test "Other note functions" do
        assert "transpose" $ (transpose 1 2) == 3
        assert "transpose" $ (transpose 11 2) == 1
+       assert "transpose" $ (transpose 1 (-2)) == 11
 
        assert "rotateLeft 0" $ (rotateLeft 0 [1, 2, 3]) == [1, 2, 3]
        assert "rotateLeft 1" $ (rotateLeft 1 [1, 2, 3]) == [2, 3, 1]
@@ -48,9 +50,9 @@ main = runTest do
 
     test "Find chord by name" do
        let x = findItemByName "dim7" allChords :: Maybe Chord
-       assert "findItemByName" $ map _.name x == Just ["dim7", "dim7th"]
-       assert "findItemByName" $ map _.notes x == Just [0, 3, 6, 9]
-       assert "findItemByName" $ (findItemByName "abc" allChords) == Nothing
+       assert "findItemByName dim7" $ map _.name x == Just ["dim7", "dim7th"]
+       assert "findItemByName dim7" $ map _.notes x == Just [0, 3, 6, 9]
+       assert "findItemByName abc" $ (findItemByName "abc" allChords) == Nothing
 
     test "Get chord notes" do
        let opts1 = { transpose: 2, invert: 0 } :: Options
@@ -62,5 +64,8 @@ main = runTest do
        assert "getChord Eb_min7" $ (getChord "Eb" "min7" opts1) == Just ["F", "Ab", "C", "Eb"]
        assert "getChord C_min7 inverted" $ (getChord "C" "min7" opts2) == Just ["F", "A", "C", "D"]
 
+    test "Get scale notes" do
+       let opts1 = { transpose: 0, invert: 0 } :: Options
+       assert "getScale C_maj" $ (getScale "C" "maj" opts1) == Just ["C", "D", "E"] 
 
 -- The End
