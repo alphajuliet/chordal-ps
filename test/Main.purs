@@ -27,9 +27,9 @@ main = runTest do
        assert "capitalise" $ (capitalise "a") == "A"
 
     test "Conversion functions" do
-       assert "noteToNum D"  $ (noteToNum "D" allNotes) == Just 2
-       assert "noteToNum Eb" $ (noteToNum "Eb" allNotes) == Just 3
-       assert "noteToNum H"  $ (noteToNum "H" allNotes) == Nothing
+       assert "noteToNum D"  $ (noteToNum allNotes "D") == Just 2
+       assert "noteToNum Eb" $ (noteToNum allNotes "Eb") == Just 3
+       assert "noteToNum H"  $ (noteToNum allNotes "H") == Nothing
 
        assert "numToNote 2"  $ (numToNote allNotes 2) == ["D"]
        assert "numToNote 14" $ (numToNote allNotes 15) == ["D#", "Eb"]
@@ -47,10 +47,10 @@ main = runTest do
        assert "rotateLeft 4" $ (rotateLeft 4 [1, 2, 3]) == [2, 3, 1]
 
     test "Find chord by name" do
-       let x = findChordByName "dim7" allChords :: Maybe Chord
-       assert "findChordByName" $ map _.name x == Just ["dim7", "dim7th"]
-       assert "findChordByName" $ map _.notes x == Just [0, 3, 6, 9]
-       assert "findChordByName" $ (findChordByName "abc" allChords) == Nothing
+       let x = findItemByName "dim7" allChords :: Maybe Chord
+       assert "findItemByName" $ map _.name x == Just ["dim7", "dim7th"]
+       assert "findItemByName" $ map _.notes x == Just [0, 3, 6, 9]
+       assert "findItemByName" $ (findItemByName "abc" allChords) == Nothing
 
     test "Get chord notes" do
        let opts1 = { transpose: 2, invert: 0 } :: Options

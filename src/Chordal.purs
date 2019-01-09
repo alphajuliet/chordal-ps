@@ -3,12 +3,12 @@
 
 module Chordal where
 
-import Prelude (($), (+), (-), (<>), (==), (&&), otherwise, mod, identity)
+import Prelude (($), (+), (-), (<>), (==), (&&), otherwise, mod)
 import Data.Array (length, take, takeEnd, elem, head, last, findIndex, index, find)
 import Data.Maybe (Maybe, fromMaybe)
 import Data.String as S
 import Data.Functor (map)
-import Control.Semigroupoid ((<<<), (>>>))
+import Control.Semigroupoid ((>>>))
 
 -- -------------------------------
 -- Utilities
@@ -37,8 +37,8 @@ allNotes = [
 
 -- Conversion functions
 
-noteToNum :: String -> Array (Array String) -> Maybe Int
-noteToNum e = findIndex (elem $ capitalise e) 
+noteToNum :: Array (Array String) -> String -> Maybe Int
+noteToNum lst e = findIndex (elem $ capitalise e) lst
 
 -- This could return a Maybe but doesn't because every Int will map to a
 -- note, modulo the length of the list.
@@ -106,8 +106,8 @@ allChords =
   ]
 
 -- -------------------------------
-findChordByName :: String -> Array Chord -> Maybe Chord
-findChordByName ch = find $ \x -> ch `elem` x.name 
+findItemByName :: String -> Array Chord -> Maybe Chord
+findItemByName ch = find $ \x -> ch `elem` x.name 
 
 -- -------------------------------
 -- Map a function over the notes in a given chord
@@ -128,13 +128,14 @@ type Options =
 -- -------------------------------
 getChord :: String -> String -> Options -> Maybe (Array String)
 getChord root ch opts = map f chord
-  where f = (mapChord g) >>> (map $ collapseNotes root)
-        g = map (transpose tr) 
-            >>> map (transpose rootNum) 
-            >>> rotateLeft inv
-        chord = findChordByName ch allChords
+  where f = _.notes
+            >>> (map $ transpose (tr + rootNum))
+            >>> (rotateLeft inv)
+            >>> (map $ numToNote allNotes)
+            >>> (map $ collapseNotes root)
+        chord = findItemByName ch allChords
         tr = opts.transpose
         inv = opts.invert
-        rootNum = fromMaybe 0 (noteToNum root allNotes)
+        rootNum = fromMaybe 0 (noteToNum allNotes root)
 
 -- The End
