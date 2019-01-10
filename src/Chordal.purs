@@ -171,6 +171,13 @@ getChord rootNote chordName opts = map f chord
 -- Take a base note, scale name, and options and return a list of notes.
 
 getScale :: String -> String -> Options -> Maybe (Array String)
-getScale rootNote scaleName opts = Just ["C", "D", "E"]
+getScale rootNote scaleName opts = map f scale
+  where f = _.notes
+            >>> (map $ transpose (tr + rootNum))
+            >>> (map $ numToNote allNotes)
+            >>> (map $ collapseNotes rootNote)
+        scale = findItemByName scaleName allScales
+        tr = opts.transpose
+        rootNum = fromMaybe 0 (noteToNum allNotes rootNote)
 
 -- The End

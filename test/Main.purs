@@ -66,6 +66,6 @@ main = runTest do
 
     test "Get scale notes" do
        let opts1 = { transpose: 0, invert: 0 } :: Options
-       assert "getScale C_maj" $ (getScale "C" "maj" opts1) == Just ["C", "D", "E"] 
+       assert "getScale C_maj" $ (getScale "C" "major" opts1) == Just ["C", "D", "E", "F", "G", "A", "B"] 
 
 -- The End
