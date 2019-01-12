@@ -55,8 +55,8 @@ main = runTest do
        assert "findItemByName abc" $ (findItemByName "abc" allChords) == Nothing
 
     test "Get chord notes" do
-       let opts1 = { transpose: 2, invert: 0 } :: Options
-       let opts2 = { transpose: 2, invert: 1 } :: Options
+       let opts1 = { transpose: 2, inversion: 0 } :: Options
+       let opts2 = { transpose: 2, inversion: 1 } :: Options
        assert "getChord C_abcd" $ (getChord "C" "abcd" opts1) == Nothing
        assert "getChord X_min" $ (getChord "X" "min7" opts1) == Just ["D", "F", "A", "C"]
        assert "getChord C_min7" $ (getChord "C" "min7" opts1) == Just ["D", "F", "A", "C"]
@@ -65,7 +65,7 @@ main = runTest do
        assert "getChord C_min7 inverted" $ (getChord "C" "min7" opts2) == Just ["F", "A", "C", "D"]
 
     test "Get scale notes" do
-       let opts1 = { transpose: 0, invert: 0 } :: Options
+       let opts1 = { transpose: 0, inversion: 0 } :: Options
        assert "getScale C_maj" $ (getScale "C" "major" opts1) == Just ["C", "D", "E", "F", "G", "A", "B"] 
 
 -- The End
