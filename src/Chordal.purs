@@ -148,7 +148,7 @@ findItemByName ch = find $ \x -> ch `elem` x.name
 
 type Options = 
   { transpose :: Int
-  , invert :: Int
+  , inversion :: Int 
   }
 
 -- -------------------------------
@@ -163,7 +163,7 @@ getChord rootNote chordName opts = map f chord
             >>> (map $ collapseNotes rootNote)
         chord = findItemByName chordName allChords
         tr = opts.transpose
-        inv = opts.invert
+        inv = opts.inversion
         rootNum = fromMaybe 0 (noteToNum allNotes rootNote)
 
 
