@@ -1,20 +1,41 @@
 -- Chordal.purs
 -- AndrewJ 2018-12-12
 
-module Chordal where
+module Chordal 
+  ( allNotes
+  , allChords
+  , getChord
+  , getScale
+  , transposeNotes
+  , capitalise
+  , rotateLeft
+  , noteToNum
+  , numToNote
+  , collapseNotes
+  , transpose
+  , findItemByName
+  , mapmap
+  , Chord
+  , Scale
+  , Options
+  ) where
 
 import Prelude (($), (+), (-), (<>), (==), (&&), otherwise, mod)
 import Data.Array ((..), length, take, takeEnd, elem, head, last, findIndex, index, find)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String as S
-import Data.Functor (map)
-import Control.Semigroupoid ((>>>))
+import Data.Functor (map, (<$>), class Functor)
+import Data.Traversable (sequence)
+import Control.Semigroupoid ((>>>), (<<<))
 
 -- -------------------------------
 -- Utilities
 
 capitalise :: String -> String
 capitalise s = (S.toUpper $ S.take 1 s) <> (S.drop 1 s)
+
+mapmap :: forall f g a b. Functor f => Functor g => (a -> b) -> f (g a) -> f (g b)
+mapmap = (<$>) <<< (<$>)
 
 -- -------------------------------
 -- Vocabulary of note names
@@ -41,18 +62,15 @@ allNotes = [
 noteToNum :: Array (Array String) -> String -> Maybe Int
 noteToNum lst e = findIndex (elem $ capitalise e) lst
 
-
 -- numToNote could return a Maybe but doesn't because every Int will map to a
 -- note, modulo the length of the list.
-
 numToNote :: Array (Array String) -> Int -> Array String
 numToNote lst n = fromMaybe ["C"] $ index lst (mod n len)
   where len = length lst
 
 
--- Choose the right alternative for the black notes based on the base note
+-- Choose one of the alternatives for the black notes based on the base note
 -- e.g. C# => D#, F#... but Db => Eb, Gb...
-
 collapseNotes :: String -> Array String -> String
 collapseNotes base lst = fromMaybe "" x
   where x | (S.length base) == 2 && (S.drop 1 base == "b") = last lst
@@ -121,13 +139,13 @@ type Scale =
 
 allScales :: Array Scale
 allScales = 
-  [ { name: ["major", "ionian"], notes: [0, 2, 4, 5, 7, 9, 11], description: "Ionian mode (I) or major scale" }
-  , { name: ["dorian"], notes: [0, 2, 3, 5, 7, 9, 10], description: "Dorian mode (II)" }
-  , { name: ["phrygian"], notes: [0, 1, 3, 5, 7, 8, 10], description: "Phrygian mode (III)" }
-  , { name: ["lydian"], notes: [0, 2, 4, 6, 9, 11], description: "Lydian mode (IV)" }
-  , { name: ["mixolydian"], notes: [0, 2, 4, 5, 9, 10], description: "Mixolydian mode (V)" }
-  , { name: ["aeolian", "natural_minor"], notes: [0, 2, 3, 5, 7, 8, 10], description: "Aeolian mode (VI)" }
-  , { name: ["locrian"], notes: [0, 1, 3, 5, 6, 8, 10], description: "Locrian mode (VII)" }
+  [ { name: ["major", "ionian", "I"], notes: [0, 2, 4, 5, 7, 9, 11], description: "Ionian mode (I) or major scale" }
+  , { name: ["dorian", "II"], notes: [0, 2, 3, 5, 7, 9, 10], description: "Dorian mode (II)" }
+  , { name: ["phrygian", "III"], notes: [0, 1, 3, 5, 7, 8, 10], description: "Phrygian mode (III)" }
+  , { name: ["lydian", "IV"], notes: [0, 2, 4, 6, 9, 11], description: "Lydian mode (IV)" }
+  , { name: ["mixolydian", "V"], notes: [0, 2, 4, 5, 9, 10], description: "Mixolydian mode (V)" }
+  , { name: ["aeolian", "natural_minor", "VI"], notes: [0, 2, 3, 5, 7, 8, 10], description: "Aeolian mode (VI)" }
+  , { name: ["locrian", "VII"], notes: [0, 1, 3, 5, 6, 8, 10], description: "Locrian mode (VII)" }
   , { name: ["minor", "harmonic_minor"], notes: [0, 2, 3, 5, 7, 8, 11], description: "Harmonic minor scale" }
   , { name: ["harmonic_major"], notes: [0, 2, 4, 5, 7, 8, 11], description: "Harmonic major scale" }
   , { name: ["blues"], notes: [0, 3, 5, 6, 7, 10], description: "Blues scale" }
@@ -135,7 +153,7 @@ allScales =
   , { name: ["major_pentatonic"], notes: [0, 2, 4, 7, 9], description: "Major pentatonic scale" }
   , { name: ["minor_pentatonic"], notes: [0, 3, 4, 7, 10], description: "Major pentatonic scale" }
   , { name: ["neapolitan_major"], notes: [0, 1, 3, 5, 7, 9, 11], description: "Neapolitan major scale" }
-  , { name: ["neapolitan_minor"], notes: [0, 1, 3, 5, 7, 8, 11], description: "Neapolitan major scale" }
+  , { name: ["neapolitan_minor"], notes: [0, 1, 3, 5, 7, 8, 11], description: "Neapolitan minor scale" }
   , { name: ["tritone"], notes: [0, 1, 4, 6, 7, 10], description: "Tritone scale (1 b2 3 b5 5 b7)" }
   ]
 
@@ -164,7 +182,7 @@ getChord rootNote chordName opts = map f chord
         chord = findItemByName chordName allChords
         tr = opts.transpose
         inv = opts.inversion
-        rootNum = fromMaybe 0 (noteToNum allNotes rootNote)
+        rootNum = fromMaybe 0 $ noteToNum allNotes rootNote
 
 
 -- -------------------------------
@@ -178,6 +196,18 @@ getScale rootNote scaleName opts = map f scale
             >>> (map $ collapseNotes rootNote)
         scale = findItemByName scaleName allScales
         tr = opts.transpose
-        rootNum = fromMaybe 0 (noteToNum allNotes rootNote)
+        rootNum = fromMaybe 0 $ noteToNum allNotes rootNote
+
+-- -------------------------------
+-- Transpose a list of notes
+
+transposeNotes :: Int -> Array String -> Maybe (Array String)
+transposeNotes n lst = f lst
+  where f = (map $ noteToNum allNotes)
+            >>> map ((map $ transpose n)
+              >>> (map $ numToNote allNotes)
+              >>> (map $ collapseNotes baseNote))
+            >>> sequence
+        baseNote = fromMaybe "C" $ head lst
 
 -- The End

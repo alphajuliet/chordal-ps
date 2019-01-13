@@ -3,6 +3,7 @@ chordal.js
 /node_modules/
 /.pulp-cache/
 /output/
+/dist/
 /generated-docs/
 /.psc-package/
 /.psc*
