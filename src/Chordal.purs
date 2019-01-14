@@ -7,6 +7,7 @@ module Chordal
   , getChord
   , getScale
   , transposeNotes
+  -- Exports for unit testing
   , capitalise
   , rotateLeft
   , noteToNum
@@ -14,7 +15,6 @@ module Chordal
   , collapseNotes
   , transpose
   , findItemByName
-  , mapmap
   , Chord
   , Scale
   , Options
@@ -22,20 +22,17 @@ module Chordal
 
 import Prelude (($), (+), (-), (<>), (==), (&&), otherwise, mod)
 import Data.Array ((..), length, take, takeEnd, elem, head, last, findIndex, index, find)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe, fromMaybe)
 import Data.String as S
-import Data.Functor (map, (<$>), class Functor)
+import Data.Functor (map, (<$>))
 import Data.Traversable (sequence)
-import Control.Semigroupoid ((>>>), (<<<))
+import Control.Semigroupoid ((>>>)) 
 
 -- -------------------------------
 -- Utilities
 
 capitalise :: String -> String
 capitalise s = (S.toUpper $ S.take 1 s) <> (S.drop 1 s)
-
-mapmap :: forall f g a b. Functor f => Functor g => (a -> b) -> f (g a) -> f (g b)
-mapmap = (<$>) <<< (<$>)
 
 -- -------------------------------
 -- Vocabulary of note names
@@ -173,7 +170,7 @@ type Options =
 -- Take a base note, chord name, and options and return a list of notes.
 
 getChord :: String -> String -> Options -> Maybe (Array String)
-getChord rootNote chordName opts = map f chord
+getChord rootNote chordName opts = f <$> chord
   where f = _.notes
             >>> (map $ transpose (tr + rootNum))
             >>> (rotateLeft inv)
@@ -189,7 +186,7 @@ getChord rootNote chordName opts = map f chord
 -- Take a base note, scale name, and options and return a list of notes.
 
 getScale :: String -> String -> Options -> Maybe (Array String)
-getScale rootNote scaleName opts = map f scale
+getScale rootNote scaleName opts = f <$> scale
   where f = _.notes
             >>> (map $ transpose (tr + rootNum))
             >>> (map $ numToNote allNotes)
@@ -204,10 +201,11 @@ getScale rootNote scaleName opts = map f scale
 transposeNotes :: Int -> Array String -> Maybe (Array String)
 transposeNotes n lst = f lst
   where f = (map $ noteToNum allNotes)
-            >>> map ((map $ transpose n)
-              >>> (map $ numToNote allNotes)
-              >>> (map $ collapseNotes baseNote))
+            >>> mapmap ((transpose n)
+                  >>> (numToNote allNotes)
+                  >>> (collapseNotes baseNote))
             >>> sequence
         baseNote = fromMaybe "C" $ head lst
+        mapmap = map >>> map
 
 -- The End

@@ -3,16 +3,18 @@
 
 module Test.Main where
 
-import Prelude
+import Prelude (Unit, discard, map, negate, ($), (+), (==))
 import Data.Maybe (Maybe(..))
-import Data.List (head)
+-- import Data.List (head)
 import Effect (Effect)
 
 import Test.Unit (suite, test)
 import Test.Unit.Main (runTest)
 import Test.Unit.Assert (assert)
 
-import Chordal
+import Chordal (Chord, Options, allChords, allNotes, capitalise, collapseNotes, 
+  findItemByName, getChord, getScale, noteToNum, numToNote, rotateLeft, 
+  transpose, transposeNotes)
 
 
 main :: Effect Unit
@@ -67,8 +69,10 @@ main = runTest do
     test "Get scale notes" do
        let opts1 = { transpose: 0, inversion: 0 } :: Options
        assert "getScale C_maj" $ (getScale "C" "major" opts1) == Just ["C", "D", "E", "F", "G", "A", "B"] 
+       assert "getScale C min7" $ (getScale "C" "min7" opts1) == Nothing
 
     test "Transpose notes" do
-       assert "transposeNotes" $ (transposeNotes 2 ["C", "D", "Eb"]) == Just ["D", "E", "F"]
+       assert "transposeNotes 2" $ (transposeNotes 2 ["C", "D", "Eb"]) == Just ["D", "E", "F"]
+       assert "transposeNotes 2" $ (transposeNotes 2 ["C", "X", "Eb"]) == Nothing
 
 -- The End
