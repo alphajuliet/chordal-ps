@@ -5,6 +5,7 @@ module Chordal
   ( allNotes
   , allChords
   , getChord
+  , allScales
   , getScale
   , transposeNotes
   -- Exports for unit testing
@@ -198,14 +199,15 @@ getScale rootNote scaleName opts = f <$> scale
 -- -------------------------------
 -- Transpose a list of notes
 
-transposeNotes :: Int -> Array String -> Maybe (Array String)
-transposeNotes n lst = f lst
+transposeNotes :: Array String -> Options -> Maybe (Array String)
+transposeNotes lst opts = f lst
   where f = (map $ noteToNum allNotes)
-            >>> mapmap ((transpose n)
+            >>> mapmap ((transpose tr)
                   >>> (numToNote allNotes)
                   >>> (collapseNotes baseNote))
             >>> sequence
         baseNote = fromMaybe "C" $ head lst
+        tr = opts.transpose
         mapmap = map >>> map
 
 -- The End

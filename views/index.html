@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Chordal</title>
+    <meta name="description" content="Chordal API">
+    <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/style.css">
+    
+    <!-- import the webpage's client-side javascript file -->
+    <script src="/client.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <h1>
+        Chordal API
+      </h1>
+    </header>
+
+    <main>
+      A musical API focusing on chords and scales. See the <a href="/README">README</a> for details.
+      
+      <h2>
+        Example API calls
+      </h2>
+      <p>
+        These all return JSON.
+      </p>
+      <h3>Chords</h3>
+      <ul>
+        <li><a href="/chords">All chords (<code>/chords</code>) </a></li>
+        <li><a href="/chord/C/maj">C major (<code>/chord/C/maj</code>) </a></li>
+        <li><a href="/chord/A/min?transpose=-2">A minor transposed down by 2 semitones (<code>/chord/A/min?transpose=-2</code>)</a></li>
+      </ul>
+
+      <h3>Scales</h3>
+      <ul>
+        <li><a href="/scales">List all available scales (<code>/scales</code>)</a></li>
+        <li><a href="/scale/A/mixolydian?transpose=4">A mixolydian mode
+            transposed up by 4 semitones (<code>/scale/A/mixolydian?transpose=4</code>)</a></li>
+      </ul>
+
+
+      <h3>Notes</h3>
+      <ul>
+        <li><a href="/allNotes">All notes in the octave (<code>/allNotes</code>)</a></li>
+        <li><a href="/notes?list=C,D%23,E&transpose=7">Transpose C, D#, and E up by
+            7 semitones (<code>/notes?list=C,D%23,E&transpose=7</code>)</a></li>
+      </ul>
+    </main>
+
+    <footer>
+      Made with <a href="https://glitch.com/">Glitch</a>!
+    </footer>
+
+    <!-- include the Glitch button to show what the webpage is about and
+          to make it easier for folks to view source and remix -->
+    <div class="glitchButton" style="position:fixed;top:20px;right:20px;"></div>
+    <script src="https://button.glitch.me/button.js"></script>
+
+  </body>
+</html>

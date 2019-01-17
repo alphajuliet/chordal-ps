@@ -72,7 +72,8 @@ main = runTest do
        assert "getScale C min7" $ (getScale "C" "min7" opts1) == Nothing
 
     test "Transpose notes" do
-       assert "transposeNotes 2" $ (transposeNotes 2 ["C", "D", "Eb"]) == Just ["D", "E", "F"]
-       assert "transposeNotes 2" $ (transposeNotes 2 ["C", "X", "Eb"]) == Nothing
+       let opts = { transpose: 2, inversion: 0 }
+       assert "transposeNotes 2" $ (transposeNotes ["C", "D", "Eb"] opts) == Just ["D", "E", "F"]
+       assert "transposeNotes 2" $ (transposeNotes ["C", "X", "Eb"] opts) == Nothing
 
 -- The End
