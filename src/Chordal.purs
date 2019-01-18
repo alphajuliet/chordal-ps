@@ -21,13 +21,12 @@ module Chordal
   , Options
   ) where
 
-import Prelude (($), (+), (-), (<>), (==), (&&), otherwise, mod)
+import Prelude (($), (+), (-), (<>), (==), (&&), (>>>), otherwise, mod)
 import Data.Array ((..), length, take, takeEnd, elem, head, last, findIndex, index, find)
 import Data.Maybe (Maybe, fromMaybe)
 import Data.String as S
 import Data.Functor (map, (<$>))
 import Data.Traversable (sequence)
-import Control.Semigroupoid ((>>>)) 
 
 -- -------------------------------
 -- Utilities
@@ -209,5 +208,6 @@ transposeNotes lst opts = f lst
         baseNote = fromMaybe "C" $ head lst
         tr = opts.transpose
         mapmap = map >>> map
+
 
 -- The End

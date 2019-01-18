@@ -7,7 +7,7 @@ const fs = require('fs'),
       app = express(),
       url = require('url'),
       R = require('ramda'),
-      C = require('./output/Chordal')
+      C = require('./dist/Chordal')
 
 // -------------------------------
 // http://expressjs.com/en/starter/static-files.html
