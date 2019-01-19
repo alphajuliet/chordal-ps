@@ -21,22 +21,23 @@ module Chordal
   , Options
   ) where
 
-import Prelude (($), (+), (-), (<>), (==), (&&), (>>>), otherwise, mod)
+import Prelude (($), (+), (-), (<>), (==), (&&), (>>>), (<$>), otherwise, mod)
 import Data.Array ((..), length, take, takeEnd, elem, head, last, findIndex, index, find)
 import Data.Maybe (Maybe, fromMaybe)
 import Data.String as S
-import Data.Functor (map, (<$>))
+import Data.Functor (map)
 import Data.Traversable (sequence)
 
 -- -------------------------------
 -- Utilities
 
 capitalise :: String -> String
+capitalise "" = ""
 capitalise s = (S.toUpper $ S.take 1 s) <> (S.drop 1 s)
 
 -- -------------------------------
--- Vocabulary of note names
 
+-- | Vocabulary of note names
 allNotes :: Array (Array String)
 allNotes = [ 
   ["C"],
@@ -56,18 +57,20 @@ allNotes = [
 -- -------------------------------
 -- Conversion functions
 
+-- | Convert a note name to an integer (mod 12)
 noteToNum :: Array (Array String) -> String -> Maybe Int
 noteToNum lst e = findIndex (elem $ capitalise e) lst
 
--- numToNote could return a Maybe but doesn't because every Int will map to a
--- note, modulo the length of the list.
+-- | Convert an integer to a note name
+-- | index could return Nothing but doesn't because every Int must map to a
+-- | note, modulo the length of the list.
 numToNote :: Array (Array String) -> Int -> Array String
-numToNote lst n = fromMaybe ["C"] $ index lst (mod n len)
+numToNote lst n = fromMaybe ["C"] $ lst `index` (mod n len)
   where len = length lst
 
 
--- Choose one of the alternatives for the black notes based on the base note
--- e.g. C# => D#, F#... but Db => Eb, Gb...
+-- | Choose one of the alternatives for the black notes based on the base note
+-- | e.g. C# -> D#, F#... but Db -> Eb, Gb...
 collapseNotes :: String -> Array String -> String
 collapseNotes base lst = fromMaybe "" x
   where x | (S.length base) == 2 && (S.drop 1 base == "b") = last lst
@@ -76,20 +79,20 @@ collapseNotes base lst = fromMaybe "" x
 -- -------------------------------
 -- Other note functions
 
+-- | A transpose is just addition modulo 12
 transpose :: Int -> Int -> Int
-transpose n root = mod (root + n) 12
+transpose n root = (root + n) `mod` 12
 
--- This is used for chord inversions
+-- | A rotation is used for chord inversions
 rotateLeft :: ∀ a. Int -> Array a -> Array a
 rotateLeft 0 lst = lst
 rotateLeft _ [] = []
 rotateLeft n lst = (takeEnd (len - nmod) lst) <> (take nmod lst)
   where len = length lst
-        nmod = mod n len
+        nmod = n `mod` len
 
 -- -------------------------------
--- Database of chords
--- See https://en.wikipedia.org/wiki/Chord_names_and_symbols_(popular_music)
+-- Chords
 
 type Chord = 
   { name :: Array String
@@ -97,6 +100,8 @@ type Chord =
   , description :: String
   }
 
+-- | Database of chords
+-- | See https://en.wikipedia.org/wiki/Chord_names_and_symbols_(popular_music)
 allChords :: Array Chord
 allChords = 
   [ { name: ["maj", "major"], notes: [0, 4, 7], description: "major (C-E-G)" }
@@ -125,8 +130,7 @@ allChords =
   ]
 
 -- ---------------------------------
--- Database of scales and modes
--- See https://en.wikipedia.org/wiki/List_of_musical_scales_and_modes
+-- Scales
 
 type Scale = 
   { name :: Array String
@@ -134,6 +138,8 @@ type Scale =
   , description :: String
   }
 
+-- | Database of scales and modes
+-- | See https://en.wikipedia.org/wiki/List_of_musical_scales_and_modes
 allScales :: Array Scale
 allScales = 
   [ { name: ["major", "ionian", "I"], notes: [0, 2, 4, 5, 7, 9, 11], description: "Ionian mode (I) or major scale" }
@@ -155,20 +161,20 @@ allScales =
   ]
 
 -- -------------------------------
+
+-- | Find an entry in the given database, based on a match in the `name` field.
 findItemByName :: ∀ a. String -> Array { name :: Array String | a } -> Maybe { name :: Array String | a }
 findItemByName ch = find $ \x -> ch `elem` x.name 
 
--- -------------------------------
--- Record for passing function options
-
+-- | Record for passing function options
 type Options = 
   { transpose :: Int
   , inversion :: Int 
   }
 
 -- -------------------------------
--- Take a base note, chord name, and options and return a list of notes.
 
+-- | Take a base note, chord name, and options and return a list of notes.
 getChord :: String -> String -> Options -> Maybe (Array String)
 getChord rootNote chordName opts = f <$> chord
   where f = _.notes
@@ -181,10 +187,9 @@ getChord rootNote chordName opts = f <$> chord
         inv = opts.inversion
         rootNum = fromMaybe 0 $ noteToNum allNotes rootNote
 
-
 -- -------------------------------
--- Take a base note, scale name, and options and return a list of notes.
 
+-- | Take a base note, scale name, and options and return a list of notes.
 getScale :: String -> String -> Options -> Maybe (Array String)
 getScale rootNote scaleName opts = f <$> scale
   where f = _.notes
@@ -196,8 +201,8 @@ getScale rootNote scaleName opts = f <$> scale
         rootNum = fromMaybe 0 $ noteToNum allNotes rootNote
 
 -- -------------------------------
--- Transpose a list of notes
 
+-- | Transpose a list of notes
 transposeNotes :: Array String -> Options -> Maybe (Array String)
 transposeNotes lst opts = f lst
   where f = (map $ noteToNum allNotes)
@@ -208,6 +213,5 @@ transposeNotes lst opts = f lst
         baseNote = fromMaybe "C" $ head lst
         tr = opts.transpose
         mapmap = map >>> map
-
 
 -- The End
