@@ -7,12 +7,13 @@ module Router
   where
 
 import Prelude
-import Data.Either
-import Control.Alternative ((<|>))
+import Effect (Effect)
+import Effect.Console (logShow)
+import Data.Either (Either(..))
 import Data.Foldable (oneOf)
 import Routing (match)
 import Routing.Match (Match, root, lit, int, str, end)
-import Chordal (allNotes, allChords, getChord, allScales, getScale, transposeNotes, Options)
+import Chordal (allNotes, allChords, getChord, allScales, getScale, transposeNotes, Options) as C
 
 -- -------------------------------
 
@@ -25,25 +26,31 @@ type ScaleName = String
 data API
   = Notes
   | Chords
-  | Chord NoteName ChordName Options
+  | Chord NoteName ChordName
   | Scales
-  | Scale NoteName ScaleName Options
-  | TransposeNotes String Options
+  | Scale NoteName ScaleName
+  {-- | TransposeNotes String --}
 
 -- | For testing
 instance showAPI :: Show API where 
   show Notes = "Notes"
   show Chords = "Chords"
-  show _ = "API route"
+  show (Chord a b) = "Chord " <> a <> b
+  show Scales = "Scales"
+  show (Scale a b) = "Scale " <> a <> b
+  show _ = "Other API route"
 
 -- -------------------------------
 
--- | Set up the routing options
+-- | Match the URI to the route
 chordalAPI :: Match API
 chordalAPI = 
   root *> oneOf
-  [ Notes <$ lit "notes"
+  [ Notes  <$ lit "notes"
   , Chords <$ lit "chords"
+  {-- , Chord <$> lit "chord" *> str <*> str --}
+  , Scales <$ lit "scales"
+  {-- , Scale <$> lit "scale" *> str <*> str --}
   ] <* end
 
 -- -------------------------------
@@ -51,10 +58,20 @@ chordalAPI =
 matchAPI :: String -> Either String API
 matchAPI = match chordalAPI
 
-test1 = matchAPI "notes"
-test2 = matchAPI "chords"
-test3 = matchAPI "chord/C/min"
-test4 = matchAPI "chrod/D/abc"
+route :: String -> Effect Unit
+route r = 
+  case m of
+       (Right Notes) -> logShow C.allNotes
+       (Right Chords) -> logShow C.allChords
+       _ -> logShow "Error"
+       where m = matchAPI r
+
+{-- test1 = matchAPI "notes" --}
+{-- test2 = matchAPI "chords" --}
+{-- test3 = matchAPI "chord/C/min" --}
+{-- test4 = matchAPI "chrod/D/abc" --}
+
+
 
 
 -- The End
