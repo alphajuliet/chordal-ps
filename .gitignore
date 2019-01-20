@@ -1,9 +1,6 @@
-chordal.js
-/bower_components/
 /node_modules/
 /.pulp-cache/
 /output/
-/dist/
 /generated-docs/
 /.psc-package/
 /.psc*
