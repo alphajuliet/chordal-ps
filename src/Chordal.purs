@@ -23,6 +23,7 @@ module Chordal
   , Chord
   , Scale
   , Options
+  , Output
   ) where
 
 import Prelude (($), (+), (-), (<>), (==), (&&), (>>>), (<$>), otherwise, mod)
@@ -181,24 +182,37 @@ type Options =
 -- Output functions
 
 type AllNotesOutput = { notes :: Array (Array String) }
+type AllChordsOutput = { chords :: Array Chord }
+type ChordOutput = 
+  { chord :: String
+  , notes :: Maybe (Array String)
+  , transpose :: Int
+  , inversion :: Int }
+type AllScalesOutput = { scales :: Array Scale }
+type ScaleOutput = 
+  { scale :: String
+  , notes :: Maybe (Array String)
+  , transpose :: Int
+  }
+
+data Output 
+  = AllNotesOutput
+  | AllChordsOutput
+  | ChordOutput
+  | AllScalesOutput
+  | ScaleOutput
+
+-- -------------------------------
 
 getAllNotes :: AllNotesOutput
 getAllNotes = { notes: allNotes }
 
 -- -------------------------------
 
-type AllChordsOutput = { chords :: Array Chord }
-
 getAllChords :: AllChordsOutput
 getAllChords = { chords: allChords }
 
 -- -------------------------------
-
-type ChordOutput = 
-  { chord :: String
-  , notes :: Maybe (Array String)
-  , transpose :: Int
-  , inversion :: Int }
 
 -- | Take a base note, chord name, and options and return a list of notes.
 getChord :: String -> String -> Options -> ChordOutput
@@ -221,18 +235,10 @@ getChord rootNote chordName opts =
 
 -- -------------------------------
 
-type AllScalesOutput = { scales :: Array Scale }
-
 getAllScales :: AllScalesOutput
 getAllScales = { scales: allScales }
 
 -- -------------------------------
-
-type ScaleOutput = 
-  { scale :: String
-  , notes :: Maybe (Array String)
-  , transpose :: Int
-  }
 
 -- | Take a base note, scale name, and options and return a list of notes.
 getScale :: String -> String -> Options -> ScaleOutput

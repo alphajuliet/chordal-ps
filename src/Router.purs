@@ -4,6 +4,8 @@
 -- Chordal routing engine, using purescript-routing
 
 module Router 
+  ( route
+  )
   where
 
 import Prelude
@@ -18,7 +20,8 @@ import Data.String (split, Pattern(..)) as S
 import Routing (match)
 import Routing.Match (Match, root, lit, str, params, end, optionalMatch)
 import Simple.JSON as JSON
-import Chordal (allNotes, allChords, getChord, allScales, getScale, transposeNotes, Options, Chord) as C
+import Chordal (getAllNotes, getAllChords, getChord, getAllScales, getScale, 
+  transposeNotes, Options, Output) as C
 
 -- -------------------------------
 
@@ -81,30 +84,19 @@ options p = { "transpose": tr, "inversion": inv }
 
 -- -------------------------------
 
-data Output = 
-    AllNotes { notes :: Array (Array String) }
-  | AllChords { chords :: Array C.Chord }
-
-
 matchAPI :: String -> Either String ChordalAPI
 matchAPI = match chordalAPI
 
 -- | Route a URI string to a Chordal function
-route :: String -> Effect Unit
+route :: String -> String
 route r = case (matchAPI r) of
-  (Right Notes) -> 
-    logShow $ JSON.writeJSON C.allNotes
-  (Right Chords) -> 
-    logShow $ JSON.writeJSON C.allChords 
-  (Right (Chord a b p)) -> 
-    logShow $ JSON.writeJSON $ C.getChord a b $ options p
-  (Right Scales) -> 
-    logShow $ JSON.writeJSON C.allScales
-  (Right (Scale a b p)) -> 
-    logShow $ JSON.writeJSON $ C.getScale a b $ options p
-  {-- (Right (TransposeNotes a p)) -> --} 
-  {--   logShow $ C.transposeNotes $ stringToArray p $ options p --}
-  (Left err) -> 
-    logShow "Route error"
+            (Right Notes) -> JSON.writeJSON C.getAllNotes
+            (Right Chords) -> JSON.writeJSON C.getAllChords 
+            (Right (Chord a b p)) -> JSON.writeJSON $ C.getChord a b $ options p
+            (Right Scales) -> JSON.writeJSON C.getAllScales
+            (Right (Scale a b p)) -> JSON.writeJSON $ C.getScale a b $ options p
+            {-- (Right (TransposeNotes a p)) -> --} 
+            {--   logShow $ C.transposeNotes $ stringToArray p $ options p --}
+            (Left err) -> JSON.writeJSON { error: "Route error" }
 
 -- The End
