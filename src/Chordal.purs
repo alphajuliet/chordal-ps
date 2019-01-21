@@ -8,6 +8,10 @@ module Chordal
   , allScales
   , getScale
   , transposeNotes
+  -- Wrapped outputs
+  , getAllNotes
+  , getAllChords
+  , getAllScales
   -- Exports for unit testing
   , capitalise
   , rotateLeft
@@ -53,6 +57,7 @@ allNotes = [
   ["A#", "Bb"],
   ["B"] 
 ]
+
 
 -- -------------------------------
 -- Conversion functions
@@ -173,15 +178,42 @@ type Options =
   }
 
 -- -------------------------------
+-- Output functions
+
+type AllNotesOutput = { notes :: Array (Array String) }
+
+getAllNotes :: AllNotesOutput
+getAllNotes = { notes: allNotes }
+
+-- -------------------------------
+
+type AllChordsOutput = { chords :: Array Chord }
+
+getAllChords :: AllChordsOutput
+getAllChords = { chords: allChords }
+
+-- -------------------------------
+
+type ChordOutput = 
+  { chord :: String
+  , notes :: Maybe (Array String)
+  , transpose :: Int
+  , inversion :: Int }
 
 -- | Take a base note, chord name, and options and return a list of notes.
-getChord :: String -> String -> Options -> Maybe (Array String)
-getChord rootNote chordName opts = f <$> chord
-  where f = _.notes
-            >>> (map $ transpose (tr + rootNum))
-            >>> (rotateLeft inv)
-            >>> (map $ numToNote allNotes)
-            >>> (map $ collapseNotes rootNote)
+getChord :: String -> String -> Options -> ChordOutput
+getChord rootNote chordName opts = 
+  { chord: rootNote <> "_" <> chordName
+  , notes: notes
+  , transpose: tr
+  , inversion: inv
+  }
+  where notes = f <$> chord
+        f = _.notes
+          >>> (map $ transpose (tr + rootNum))
+          >>> (rotateLeft inv)
+          >>> (map $ numToNote allNotes)
+          >>> (map $ collapseNotes rootNote)
         chord = findItemByName chordName allChords
         tr = opts.transpose
         inv = opts.inversion
@@ -189,13 +221,31 @@ getChord rootNote chordName opts = f <$> chord
 
 -- -------------------------------
 
+type AllScalesOutput = { scales :: Array Scale }
+
+getAllScales :: AllScalesOutput
+getAllScales = { scales: allScales }
+
+-- -------------------------------
+
+type ScaleOutput = 
+  { scale :: String
+  , notes :: Maybe (Array String)
+  , transpose :: Int
+  }
+
 -- | Take a base note, scale name, and options and return a list of notes.
-getScale :: String -> String -> Options -> Maybe (Array String)
-getScale rootNote scaleName opts = f <$> scale
-  where f = _.notes
-            >>> (map $ transpose (tr + rootNum))
-            >>> (map $ numToNote allNotes)
-            >>> (map $ collapseNotes rootNote)
+getScale :: String -> String -> Options -> ScaleOutput
+getScale rootNote scaleName opts = 
+  { scale: rootNote <> "_" <> scaleName
+  , notes: notes
+  , transpose: tr
+  }
+  where notes = f <$> scale
+        f = _.notes
+          >>> (map $ transpose (tr + rootNum))
+          >>> (map $ numToNote allNotes)
+          >>> (map $ collapseNotes rootNote)
         scale = findItemByName scaleName allScales
         tr = opts.transpose
         rootNum = fromMaybe 0 $ noteToNum allNotes rootNote

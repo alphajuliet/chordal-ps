@@ -1737,13 +1737,16 @@ var PS = {};
               if (Data_Boolean.otherwise) {
                   return Data_Array.head(lst);
               };
-              throw new Error("Failed pattern match at Chordal line 73, column 9 - line 74, column 33: " + [  ]);
+              throw new Error("Failed pattern match at Chordal line 81, column 9 - line 82, column 33: " + [  ]);
           })();
           return Data_Maybe.fromMaybe("")(x);
       };
   };
-  var capitalise = function (s) {
-      return Data_String_Common.toUpper(Data_String_CodePoints.take(1)(s)) + Data_String_CodePoints.drop(1)(s);
+  var capitalise = function (v) {
+      if (v === "") {
+          return "";
+      };
+      return Data_String_Common.toUpper(Data_String_CodePoints.take(1)(v)) + Data_String_CodePoints.drop(1)(v);
   };
   var noteToNum = function (lst) {
       return function (e) {
@@ -1815,33 +1818,44 @@ var PS = {};
       notes: [ 0, 1, 4, 6, 7, 10 ],
       description: "Tritone scale (1 b2 3 b5 5 b7)"
   } ];
+  var getAllScales = {
+      scales: allScales
+  };
   var allNotes = [ [ "C" ], [ "C#", "Db" ], [ "D" ], [ "D#", "Eb" ], [ "E" ], [ "F" ], [ "F#", "Gb" ], [ "G" ], [ "G#", "Ab" ], [ "A" ], [ "A#", "Bb" ], [ "B" ] ];
+  var getAllNotes = {
+      notes: allNotes
+  };
   var getScale = function (rootNote) {
       return function (scaleName) {
           return function (opts) {
               var scale = findItemByName(scaleName)(allScales);
               var rootNum = Data_Maybe.fromMaybe(0)(noteToNum(allNotes)(rootNote));
-              var f = function ($6) {
-                  return (function ($7) {
-                      return Data_Functor.map(Data_Functor.functorArray)(collapseNotes(rootNote))(Data_Functor.map(Data_Functor.functorArray)(numToNote(allNotes))($7));
+              var f = function ($8) {
+                  return (function ($9) {
+                      return Data_Functor.map(Data_Functor.functorArray)(collapseNotes(rootNote))(Data_Functor.map(Data_Functor.functorArray)(numToNote(allNotes))($9));
                   })(Data_Functor.map(Data_Functor.functorArray)(transpose(opts.transpose + rootNum | 0))((function (v) {
                       return v.notes;
-                  })($6)));
+                  })($8)));
               };
-              return Data_Functor.map(Data_Maybe.functorMaybe)(f)(scale);
+              var notes = Data_Functor.map(Data_Maybe.functorMaybe)(f)(scale);
+              return {
+                  scale: rootNote + ("_" + scaleName),
+                  notes: notes,
+                  transpose: opts.transpose
+              };
           };
       };
   };
   var transposeNotes = function (lst) {
       return function (opts) {
-          var mapmap = function ($8) {
-              return Data_Functor.map(Data_Functor.functorArray)(Data_Functor.map(Data_Maybe.functorMaybe)($8));
+          var mapmap = function ($10) {
+              return Data_Functor.map(Data_Functor.functorArray)(Data_Functor.map(Data_Maybe.functorMaybe)($10));
           };
           var baseNote = Data_Maybe.fromMaybe("C")(Data_Array.head(lst));
-          var f = function ($9) {
-              return Data_Traversable.sequence(Data_Traversable.traversableArray)(Data_Maybe.applicativeMaybe)(mapmap(function ($10) {
-                  return collapseNotes(baseNote)(numToNote(allNotes)(transpose(opts.transpose)($10)));
-              })(Data_Functor.map(Data_Functor.functorArray)(noteToNum(allNotes))($9)));
+          var f = function ($11) {
+              return Data_Traversable.sequence(Data_Traversable.traversableArray)(Data_Maybe.applicativeMaybe)(mapmap(function ($12) {
+                  return collapseNotes(baseNote)(numToNote(allNotes)(transpose(opts.transpose)($12)));
+              })(Data_Functor.map(Data_Functor.functorArray)(noteToNum(allNotes))($11)));
           };
           return f(lst);
       };
@@ -1939,19 +1953,28 @@ var PS = {};
       notes: [ 0, 3, 7, 11, 14 ],
       description: "minor/major 9th (C-E\u266d-G-B-D)"
   } ];
+  var getAllChords = {
+      chords: allChords
+  };
   var getChord = function (rootNote) {
       return function (chordName) {
           return function (opts) {
               var rootNum = Data_Maybe.fromMaybe(0)(noteToNum(allNotes)(rootNote));
-              var f = function ($11) {
-                  return (function ($12) {
-                      return Data_Functor.map(Data_Functor.functorArray)(collapseNotes(rootNote))(Data_Functor.map(Data_Functor.functorArray)(numToNote(allNotes))(rotateLeft(opts.inversion)($12)));
+              var f = function ($13) {
+                  return (function ($14) {
+                      return Data_Functor.map(Data_Functor.functorArray)(collapseNotes(rootNote))(Data_Functor.map(Data_Functor.functorArray)(numToNote(allNotes))(rotateLeft(opts.inversion)($14)));
                   })(Data_Functor.map(Data_Functor.functorArray)(transpose(opts.transpose + rootNum | 0))((function (v) {
                       return v.notes;
-                  })($11)));
+                  })($13)));
               };
               var chord = findItemByName(chordName)(allChords);
-              return Data_Functor.map(Data_Maybe.functorMaybe)(f)(chord);
+              var notes = Data_Functor.map(Data_Maybe.functorMaybe)(f)(chord);
+              return {
+                  chord: rootNote + ("_" + chordName),
+                  notes: notes,
+                  transpose: opts.transpose,
+                  inversion: opts.inversion
+              };
           };
       };
   };
@@ -1961,6 +1984,9 @@ var PS = {};
   exports["allScales"] = allScales;
   exports["getScale"] = getScale;
   exports["transposeNotes"] = transposeNotes;
+  exports["getAllNotes"] = getAllNotes;
+  exports["getAllChords"] = getAllChords;
+  exports["getAllScales"] = getAllScales;
   exports["capitalise"] = capitalise;
   exports["rotateLeft"] = rotateLeft;
   exports["noteToNum"] = noteToNum;
