@@ -20,7 +20,7 @@ app.get('/', function(request, response) {
 // Redirect all /api calls to the Chordal router
 app.use('/api', function (req, res, next) {
   console.log('Request: ', req.originalUrl)
-  const json = JSON.parse(C.route(req.path))
+  const json = JSON.parse(C.route(req.url))
   res.json(json)
 })
 
