@@ -181,18 +181,27 @@ type Options =
 -- -------------------------------
 -- Output functions
 
-type AllNotesOutput = { notes :: Array (Array String) }
-type AllChordsOutput = { chords :: Array Chord }
+type AllNotesOutput = 
+  { notes :: Array (Array String) 
+  }
+type AllChordsOutput = 
+  { chords :: Array Chord 
+  }
 type ChordOutput = 
   { chord :: String
   , notes :: Maybe (Array String)
   , transpose :: Int
   , inversion :: Int }
-type AllScalesOutput = { scales :: Array Scale }
+type AllScalesOutput = 
+  { scales :: Array Scale 
+  }
 type ScaleOutput = 
   { scale :: String
   , notes :: Maybe (Array String)
   , transpose :: Int
+  }
+type ErrorOutput = 
+  { error :: String
   }
 
 data Output 
@@ -201,6 +210,7 @@ data Output
   | ChordOutput
   | AllScalesOutput
   | ScaleOutput
+  | ErrorOutput
 
 -- -------------------------------
 

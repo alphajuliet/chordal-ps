@@ -7,7 +7,7 @@
     "start": "node server.js",
     "test": "pulp test",
     "build": "pulp build",
-    "bundle": "pulp browserify -O --standalone Chordal --main Chordal --to dist/Chordal.js"
+    "bundle": "pulp browserify -O --standalone Router --main Router --to dist/Router.js"
   },
   "dependencies": {
     "express": "^4.16.3",

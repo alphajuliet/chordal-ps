@@ -3,11 +3,12 @@
 
 // Imports
 const fs = require('fs'),
-      express = require('express'),
-      app = express(),
-      url = require('url'),
-      R = require('ramda'),
-      C = require('./dist/Chordal')
+  express = require('express'),
+  app = express(),
+  url = require('url'),
+  R = require('ramda'),
+  C = require('./dist/Chordal'),
+  CR = require('./dist/Router')
 
 // -------------------------------
 // http://expressjs.com/en/starter/static-files.html
@@ -17,6 +18,13 @@ app.use(express.static('public'));
 app.get('/', function(request, response) {
   response.sendFile(__dirname + '/views/index.html');
 });
+
+// Redirect all /api calls to the Chordal router
+app.use('/api', function (req, res, next) {
+  console.log('Request: ', req.originalUrl)
+  const json = JSON.parse(CR.route(req.path))
+  res.json(json)
+})
 
 // Render and display the README.md file with the API documentation
 app.get('/README', function (req, res) {
@@ -34,9 +42,7 @@ app.get('/README', function (req, res) {
 app.get('/allnotes', (req, res) => {
   console.log('GET /allNotes')
   
-  const x = C.allNotes
-  const json = { notes: x }
-
+  const json = C.getAllNotes
   const status = json.error ? 400 : 200
   res.status(status).json(json)
 })
@@ -46,12 +52,7 @@ app.get('/allnotes', (req, res) => {
 app.get('/chords', (req, res) => {
   console.log('GET /chords')
 
-  let json
-  const x = C.allChords
-  if (R.equals(x, {}))
-    json = { error: "Chords not available." }
-  else
-    json = { chords: x }
+  const json = C.getAllChords
   const status = json.error ? 400 : 200
   res.status(status).json(json)
 })
@@ -71,19 +72,9 @@ app.get('/chord/:note/:chord', (req, res) => {
   console.log(`GET ${req.url}`)
   console.log(`Chord: ${note}_${chord}, transpose by ${transpose}, invert by ${inversion}`)
 
-  let json
-  const x = C.getChord(note)(chord)(opts)
-  if (R.equals(x, {}))
-    json = { error: "Chord not recognised." }
-  else
-    json = { 
-      notes: x.value0,
-      transpose: transpose,
-      inversion: inversion
-    }
+  const json = C.getChord(note)(chord)(opts)
   const status = json.error ? 400 : 200
   res.status(status).json(json)
-  
 })
 
 // ---------------------------------
@@ -118,12 +109,7 @@ app.get('/notes', (req, res) => {
 app.get('/scales', (req, res) => {
   console.log('GET /scales')
   
-  let json
-  const x = C.allScales
-  if (R.equals(x, {}))
-    json = { error: "Scales not available." }
-  else
-    json = { scales: x }
+  const json = C.getAllScales
   const status = json.error ? 400 : 200
   res.status(status).json(json)
 })
@@ -143,15 +129,7 @@ app.get('/scale/:note/:scale', (req, res) => {
   console.log(`GET ${req.url}`)
   console.log(`Scale: ${note} ${scale}`)
 
-  let json
-  const x = C.getScale(note)(scale)(opts)
-  if (R.equals(x, {}))
-    json = { error: "Scales not available." }
-  else
-    json = { 
-      notes: x.value0,
-      transpose: tr
-    }
+  const json = C.getScale(note)(scale)(opts)
   const status = json.error ? 400 : 200
   res.status(status).json(json)
 })
