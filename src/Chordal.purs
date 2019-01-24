@@ -3,11 +3,11 @@
 
 module Chordal 
   ( allNotes
+  , getNote
   , allChords
   , getChord
   , allScales
   , getScale
-  , transposeNotes
   -- Wrapped outputs
   , getAllNotes
   , getAllChords
@@ -184,6 +184,10 @@ type Options =
 type AllNotesOutput = 
   { notes :: Array (Array String) 
   }
+type NoteOutput =
+  { notes :: Maybe (Array String)
+  , transpose :: Int
+  }
 type AllChordsOutput = 
   { chords :: Array Chord 
   }
@@ -206,6 +210,7 @@ type ErrorOutput =
 
 data Output 
   = AllNotesOutput
+  | NoteOutput
   | AllChordsOutput
   | ChordOutput
   | AllScalesOutput
@@ -269,14 +274,19 @@ getScale rootNote scaleName opts =
 -- -------------------------------
 
 -- | Transpose a list of notes
-transposeNotes :: Array String -> Options -> Maybe (Array String)
-transposeNotes lst opts = f lst
-  where f = (map $ noteToNum allNotes)
+getNote :: String -> Options -> NoteOutput
+getNote n opts = 
+  { notes: notes
+  , transpose: tr
+  }
+  where notes = f noteList
+        f = (map $ noteToNum allNotes)
             >>> mapmap ((transpose tr)
                   >>> (numToNote allNotes)
                   >>> (collapseNotes baseNote))
             >>> sequence
-        baseNote = fromMaybe "C" $ head lst
+        noteList = S.split (S.Pattern ",") n
+        baseNote = fromMaybe "C" $ head noteList
         tr = opts.transpose
         mapmap = map >>> map
 

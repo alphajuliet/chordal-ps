@@ -2171,6 +2171,7 @@ var PS = {};
   var Data_String = PS["Data.String"];
   var Data_String_CodePoints = PS["Data.String.CodePoints"];
   var Data_String_Common = PS["Data.String.Common"];
+  var Data_String_Pattern = PS["Data.String.Pattern"];
   var Data_Traversable = PS["Data.Traversable"];
   var Prelude = PS["Prelude"];
   var transpose = function (n) {
@@ -2299,17 +2300,36 @@ var PS = {};
   var getAllNotes = {
       notes: allNotes
   };
+  var getNote = function (n) {
+      return function (opts) {
+          var noteList = Data_String_Common.split(",")(n);
+          var mapmap = function ($8) {
+              return Data_Functor.map(Data_Functor.functorArray)(Data_Functor.map(Data_Maybe.functorMaybe)($8));
+          };
+          var baseNote = Data_Maybe.fromMaybe("C")(Data_Array.head(noteList));
+          var f = function ($9) {
+              return Data_Traversable.sequence(Data_Traversable.traversableArray)(Data_Maybe.applicativeMaybe)(mapmap(function ($10) {
+                  return collapseNotes(baseNote)(numToNote(allNotes)(transpose(opts.transpose)($10)));
+              })(Data_Functor.map(Data_Functor.functorArray)(noteToNum(allNotes))($9)));
+          };
+          var notes = f(noteList);
+          return {
+              notes: notes,
+              transpose: opts.transpose
+          };
+      };
+  };
   var getScale = function (rootNote) {
       return function (scaleName) {
           return function (opts) {
               var scale = findItemByName(scaleName)(allScales);
               var rootNum = Data_Maybe.fromMaybe(0)(noteToNum(allNotes)(rootNote));
-              var f = function ($8) {
-                  return (function ($9) {
-                      return Data_Functor.map(Data_Functor.functorArray)(collapseNotes(rootNote))(Data_Functor.map(Data_Functor.functorArray)(numToNote(allNotes))($9));
+              var f = function ($11) {
+                  return (function ($12) {
+                      return Data_Functor.map(Data_Functor.functorArray)(collapseNotes(rootNote))(Data_Functor.map(Data_Functor.functorArray)(numToNote(allNotes))($12));
                   })(Data_Functor.map(Data_Functor.functorArray)(transpose(opts.transpose + rootNum | 0))((function (v) {
                       return v.notes;
-                  })($8)));
+                  })($11)));
               };
               var notes = Data_Functor.map(Data_Maybe.functorMaybe)(f)(scale);
               return {
@@ -2439,6 +2459,7 @@ var PS = {};
       };
   };
   exports["allNotes"] = allNotes;
+  exports["getNote"] = getNote;
   exports["allChords"] = allChords;
   exports["getChord"] = getChord;
   exports["allScales"] = allScales;
@@ -4049,6 +4070,18 @@ var PS = {};
       };
       return Scale;
   })();
+  var Note = (function () {
+      function Note(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      Note.create = function (value0) {
+          return function (value1) {
+              return new Note(value0, value1);
+          };
+      };
+      return Note;
+  })();
   var stringToInt = function (s) {
       return Data_Maybe.fromMaybe(0)(Control_Bind.bind(Data_Maybe.bindMaybe)(s)(Data_Int.fromString));
   };
@@ -4071,7 +4104,10 @@ var PS = {};
       if (v instanceof Scale) {
           return "Scale " + (v.value0 + v.value1);
       };
-      throw new Error("Failed pattern match at Router (line 44, column 1 - line 44, column 36): " + [ v.constructor.name ]);
+      if (v instanceof Note) {
+          return "Note " + v.value0;
+      };
+      throw new Error("Failed pattern match at Router (line 43, column 1 - line 43, column 36): " + [ v.constructor.name ]);
   });
   var options = function (p) {
       var tr = stringToInt(Data_Map_Internal.lookup(Data_Ord.ordString)("transpose")(p));
@@ -4082,7 +4118,7 @@ var PS = {};
       };
   };
   var optParams = Control_Apply.applyFirst(Routing_Match.matchApply)(Data_Functor.map(Routing_Match.matchFunctor)(Data_Maybe.maybe(Data_Map_Internal.empty)(Control_Category.identity(Control_Category.categoryFn)))(Routing_Match.optionalMatch(Routing_Match.params)))(Routing_Match.end);
-  var chordalAPI = Control_Apply.applyFirst(Routing_Match.matchApply)(Control_Apply.applySecond(Routing_Match.matchApply)(Routing_Match.root)(Data_Foldable.oneOf(Data_Foldable.foldableArray)(Routing_Match.matchPlus)([ Data_Functor.voidRight(Routing_Match.matchFunctor)(Notes.value)(Routing_Match.lit("notes")), Data_Functor.voidRight(Routing_Match.matchFunctor)(Chords.value)(Routing_Match.lit("chords")), Control_Apply.apply(Routing_Match.matchApply)(Control_Apply.apply(Routing_Match.matchApply)(Data_Functor.map(Routing_Match.matchFunctor)(Chord.create)(Control_Apply.applySecond(Routing_Match.matchApply)(Routing_Match.lit("chord"))(Routing_Match.str)))(Routing_Match.str))(optParams), Data_Functor.voidRight(Routing_Match.matchFunctor)(Scales.value)(Routing_Match.lit("scales")), Control_Apply.apply(Routing_Match.matchApply)(Control_Apply.apply(Routing_Match.matchApply)(Data_Functor.map(Routing_Match.matchFunctor)(Scale.create)(Control_Apply.applySecond(Routing_Match.matchApply)(Routing_Match.lit("scale"))(Routing_Match.str)))(Routing_Match.str))(optParams) ])))(Routing_Match.end);
+  var chordalAPI = Control_Apply.applyFirst(Routing_Match.matchApply)(Control_Apply.applySecond(Routing_Match.matchApply)(Routing_Match.root)(Data_Foldable.oneOf(Data_Foldable.foldableArray)(Routing_Match.matchPlus)([ Data_Functor.voidRight(Routing_Match.matchFunctor)(Notes.value)(Routing_Match.lit("notes")), Data_Functor.voidRight(Routing_Match.matchFunctor)(Chords.value)(Routing_Match.lit("chords")), Control_Apply.apply(Routing_Match.matchApply)(Control_Apply.apply(Routing_Match.matchApply)(Data_Functor.map(Routing_Match.matchFunctor)(Chord.create)(Control_Apply.applySecond(Routing_Match.matchApply)(Routing_Match.lit("chord"))(Routing_Match.str)))(Routing_Match.str))(optParams), Data_Functor.voidRight(Routing_Match.matchFunctor)(Scales.value)(Routing_Match.lit("scales")), Control_Apply.apply(Routing_Match.matchApply)(Control_Apply.apply(Routing_Match.matchApply)(Data_Functor.map(Routing_Match.matchFunctor)(Scale.create)(Control_Apply.applySecond(Routing_Match.matchApply)(Routing_Match.lit("scale"))(Routing_Match.str)))(Routing_Match.str))(optParams), Control_Apply.apply(Routing_Match.matchApply)(Data_Functor.map(Routing_Match.matchFunctor)(Note.create)(Control_Apply.applySecond(Routing_Match.matchApply)(Routing_Match.lit("note"))(Routing_Match.str)))(optParams) ])))(Routing_Match.end);
   var matchAPI = Routing.match(chordalAPI);
   var route = function (r) {
       var v = matchAPI(r);
@@ -4133,6 +4169,13 @@ var PS = {};
               return "transpose";
           }))(Simple_JSON.writeForeignInt)(Simple_JSON.nilWriteForeignFields)()()())()()())()()()))(Chordal.getScale(v.value0.value0)(v.value0.value1)(options(v.value0.value2)));
       };
+      if (v instanceof Data_Either.Right && v.value0 instanceof Note) {
+          return Simple_JSON.writeJSON(Simple_JSON.recordWriteForeign()(Simple_JSON.consWriteForeignFields(new Data_Symbol.IsSymbol(function () {
+              return "notes";
+          }))(Simple_JSON.writeForeignMaybe(Simple_JSON.writeForeignArray(Simple_JSON.writeForeignString)))(Simple_JSON.consWriteForeignFields(new Data_Symbol.IsSymbol(function () {
+              return "transpose";
+          }))(Simple_JSON.writeForeignInt)(Simple_JSON.nilWriteForeignFields)()()())()()()))(Chordal.getNote(v.value0.value0)(options(v.value0.value1)));
+      };
       if (v instanceof Data_Either.Left) {
           return Simple_JSON.writeJSON(Simple_JSON.recordWriteForeign()(Simple_JSON.consWriteForeignFields(new Data_Symbol.IsSymbol(function () {
               return "error";
@@ -4140,7 +4183,7 @@ var PS = {};
               error: "Route error"
           });
       };
-      throw new Error("Failed pattern match at Router (line 92, column 11 - line 100, column 65): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Router (line 91, column 11 - line 98, column 65): " + [ v.constructor.name ]);
   };
   exports["route"] = route;
 })(PS["Router"] = PS["Router"] || {});module.exports = PS["Router"];

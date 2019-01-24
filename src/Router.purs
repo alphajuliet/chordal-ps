@@ -20,8 +20,7 @@ import Data.String (split, Pattern(..)) as S
 import Routing (match)
 import Routing.Match (Match, root, lit, str, params, end, optionalMatch)
 import Simple.JSON as JSON
-import Chordal (getAllNotes, getAllChords, getChord, getAllScales, getScale, 
-  transposeNotes, Options, Output) as C
+import Chordal (getAllNotes, getAllChords, getChord, getAllScales, getScale, getNote, Options, Output) as C
 
 -- -------------------------------
 
@@ -38,7 +37,7 @@ data ChordalAPI
   | Chord NoteName ChordName Params
   | Scales
   | Scale NoteName ScaleName Params
-  {-- | TransposeNotes String Params --}
+  | Note NoteName Params
 
 -- | For testing
 instance showAPI :: Show ChordalAPI where 
@@ -47,7 +46,7 @@ instance showAPI :: Show ChordalAPI where
   show (Chord a b _) = "Chord " <> a <> b
   show Scales = "Scales"
   show (Scale a b _) = "Scale " <> a <> b
-  {-- show (TransposeNotes a _) = "Transpose " <> a --}
+  show (Note a _) = "Note " <> a
 
 -- -------------------------------
 
@@ -63,7 +62,7 @@ chordalAPI =
   , Chord <$> (lit "chord" *> str) <*> str <*> optParams
   , Scales <$ lit "scales"
   , Scale <$> (lit "scale" *> str) <*> str <*> optParams
-  {-- , TransposeNotes <$> (lit "notes" *> params) <*> optParams --}
+  , Note <$> (lit "note" *> str) <*> optParams
   ] <* end
 
 -- -------------------------------
@@ -95,8 +94,7 @@ route r = case (matchAPI r) of
             (Right (Chord a b p)) -> JSON.writeJSON $ C.getChord a b $ options p
             (Right Scales) -> JSON.writeJSON C.getAllScales
             (Right (Scale a b p)) -> JSON.writeJSON $ C.getScale a b $ options p
-            {-- (Right (TransposeNotes a p)) -> --} 
-            {--   logShow $ C.transposeNotes $ stringToArray p $ options p --}
+            (Right (Note a p)) -> JSON.writeJSON $ C.getNote a $ options p
             (Left err) -> JSON.writeJSON { error: "Route error" }
 
 -- The End

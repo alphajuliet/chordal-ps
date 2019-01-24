@@ -14,7 +14,7 @@ import Test.Unit.Assert (assert)
 
 import Chordal (Chord, Options, allChords, allNotes, capitalise, collapseNotes, 
   findItemByName, getChord, getScale, noteToNum, numToNote, rotateLeft, 
-  transpose, transposeNotes)
+  transpose, getNote)
 
 
 main :: Effect Unit
@@ -73,7 +73,7 @@ main = runTest do
 
     test "Transpose notes" do
        let opts = { transpose: 2, inversion: 0 }
-       assert "transposeNotes 2" $ (transposeNotes ["C", "D", "Eb"] opts) == Just ["D", "E", "F"]
-       assert "transposeNotes 2" $ (transposeNotes ["C", "X", "Eb"] opts) == Nothing
+       assert "getNote 2" $ (getNote "C,D,Eb" opts) == Just ["D", "E", "F"]
+       assert "getNote 2" $ (getNote "C,X,Eb" opts) == Nothing
 
 -- The End
