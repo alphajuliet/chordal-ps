@@ -73,7 +73,7 @@ main = runTest do
 
     test "Transpose notes" do
        let opts = { transpose: 2, inversion: 0 }
-       assert "getNote 2" $ (getNote "C,D,Eb" opts) == Just ["D", "E", "F"]
-       assert "getNote 2" $ (getNote "C,X,Eb" opts) == Nothing
+       assert "getNote 2" $ (getNote "C,D,Eb" opts).notes == Just ["D", "E", "F"]
+       assert "getNote 2" $ (getNote "C,X,Eb" opts).notes == Nothing
 
 -- The End
