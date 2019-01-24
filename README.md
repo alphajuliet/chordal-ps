@@ -10,25 +10,24 @@ Similarly, for scales, a list of known scales and modes can be requested, and th
 specific one requested with a given root note and optional transposition.
 
 This is a reimplementation in PureScript of the [original version](https://github.com/alphajuliet/chordal/) in JavaScript. 
-It is not complete.
 
 ## API 
 
 ### List available notes
 
-`GET /allNotes`
+`GET /api/notes`
 
 Return the available note names in the octave, including alternates, e.g. C# == Db.
 
 ### List available chords
 
-`GET /chords` 
+`GET /api/chords` 
 
 Return the available chords names, their constituent semitones, and descriptions.
 
 ### Return chord notes
 
-`GET /chord/<note>/<chord>`
+`GET /api/chord/<note>/<chord>`
 
 Return the notes in the requested chord. The handling of accidentals (# or b) is
 based on the root note.
@@ -43,8 +42,8 @@ based on the root note.
 
 | Request | Response |
 | ------- | -------- |
-|`GET /chord/E/min` | `{"chord":"E_min","transpose":0,"inversion":0,"notes":[["E","G","B"]}`|
-|`GET /chord/Gb/maj7` | `{"chord":"Gb_maj7","transpose":0,"inversion":0,"notes":["Gb","Bb","Db","F"]}`|
+|`GET /api/chord/E/min` | `{"chord":"E_min","transpose":0,"inversion":0,"notes":[["E","G","B"]}`|
+|`GET /api/chord/Gb/maj7` | `{"chord":"Gb_maj7","transpose":0,"inversion":0,"notes":["Gb","Bb","Db","F"]}`|
 
 #### Notes
 
@@ -54,13 +53,13 @@ based on the root note.
 
 ### Transpose a chord
 
-`GET /chord/<note>/<chord>?transpose=<n>`
+`GET /api/chord/<note>/<chord>?transpose=<n>`
 
 Transpose the notes in the requested chord up/down by `n`.
 
 ### Invert a chord
 
-`GET /chord/<note>/<chord>?inversion=<n>`
+`GET /api/chord/<note>/<chord>?inversion=<n>`
 
 Provide the `n`th inversion of the chord. This can be combined with
 transposition in the same request.
@@ -69,12 +68,12 @@ transposition in the same request.
 
 | Request | Response |
 | ------- | -------- |
-|`GET /chord/F/maj?transpose=3` | `{"chord":"F_maj","transpose":3,"inversion":0,"notes":["G#","C","D#"]}`|
-|`GET /chord/F/maj?inversion=1` | `{"chord":"F_maj","transpose":0,"inversion":1,"notes":[["A","C","F"]}`|
+|`GET /api/chord/F/maj?transpose=3` | `{"chord":"F_maj","transpose":3,"inversion":0,"notes":["G#","C","D#"]}`|
+|`GET /api/chord/F/maj?inversion=1` | `{"chord":"F_maj","transpose":0,"inversion":1,"notes":[["A","C","F"]}`|
 
 ### Transpose a list of notes
 
-`GET /notes?list=<lst>&transpose=<n>`
+`GET /api/note/<lst>&transpose=<n>`
 
 Transpose a list of notes by `n` semitones. The list of notes is separated by
 commas, and '#" must be encoded as `%23`. The notes need have no relation to
@@ -86,7 +85,7 @@ of played notes.
 
 | Request | Response |
 | ------- | -------- |
-|`GET /notes?list=C,D,E&transpose=1` | `{"transpose":1,"notes":["C#","D#","F"]}`|
+|`GET /api/note/C,D,E&transpose=1` | `{"transpose":1,"notes":["C#","D#","F"]}`|
 
 ### List known scales
 
@@ -94,14 +93,16 @@ of played notes.
 
 ### Get a scale
 
-`GET /scale/<note>/<scale>?transpose=<n>`
+`GET /api/scale/<note>/<scale>?transpose=<n>`
 
 #### Examples
 
 | Request | Response |
 | ------- | -------- |
-|`GET /scale/Db/harmonic_minor&transpose=5` | `{"scale":"Db harmonic_minor","notes":["Gb","Ab","A","B","Db","D","F"]}`|
+|`GET /api/scale/Db/harmonic_minor&transpose=5` | `{"scale":"Db harmonic_minor","notes":["Gb","Ab","A","B","Db","D","F"]}`|
 
 ----
+
+The code is live on [Glitch](https://chordal-ps.glitch.me/)
 
 Project [i:513761]
