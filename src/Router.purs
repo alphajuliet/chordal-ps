@@ -9,8 +9,6 @@ module Router
   where
 
 import Prelude
-import Effect (Effect)
-import Effect.Console (logShow)
 import Data.Int (fromString)
 import Data.Map (Map, lookup, empty) as M
 import Data.Either (Either(..))
@@ -20,7 +18,7 @@ import Data.String (split, Pattern(..)) as S
 import Routing (match)
 import Routing.Match (Match, root, lit, str, params, end, optionalMatch)
 import Simple.JSON as JSON
-import Chordal (getAllNotes, getAllChords, getChord, getAllScales, getScale, getNote, Options, Output) as C
+import Chordal (getAllNotes, getAllChords, getChord, getAllScales, getScale, getNote, Options) as C
 
 -- -------------------------------
 
@@ -89,12 +87,12 @@ matchAPI = match chordalAPI
 -- | Route a URI string to a Chordal function
 route :: String -> String
 route r = case (matchAPI r) of
-            (Right Notes) -> JSON.writeJSON C.getAllNotes
-            (Right Chords) -> JSON.writeJSON C.getAllChords 
+            (Right Notes)         -> JSON.writeJSON C.getAllNotes
+            (Right Chords)        -> JSON.writeJSON C.getAllChords 
             (Right (Chord a b p)) -> JSON.writeJSON $ C.getChord a b $ options p
-            (Right Scales) -> JSON.writeJSON C.getAllScales
+            (Right Scales)        -> JSON.writeJSON C.getAllScales
             (Right (Scale a b p)) -> JSON.writeJSON $ C.getScale a b $ options p
-            (Right (Note a p)) -> JSON.writeJSON $ C.getNote a $ options p
-            (Left err) -> JSON.writeJSON { error: "Route error" }
+            (Right (Note a p))    -> JSON.writeJSON $ C.getNote a $ options p
+            (Left err)            -> JSON.writeJSON { error: "Route error" }
 
 -- The End

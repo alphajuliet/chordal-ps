@@ -36,6 +36,7 @@ import Data.Traversable (sequence)
 -- -------------------------------
 -- Utilities
 
+-- | Capitalise a string
 capitalise :: String -> String
 capitalise "" = ""
 capitalise s = (S.toUpper $ S.take 1 s) <> (S.drop 1 s)
@@ -67,7 +68,7 @@ allNotes = [
 noteToNum :: Array (Array String) -> String -> Maybe Int
 noteToNum lst e = findIndex (elem $ capitalise e) lst
 
--- | Convert an integer to a note name
+-- | Convert an integer to a note name.
 -- | index could return Nothing but doesn't because every Int must map to a
 -- | note, modulo the length of the list.
 numToNote :: Array (Array String) -> Int -> Array String
@@ -107,7 +108,7 @@ type Chord =
   }
 
 -- | Database of chords
--- | See https://en.wikipedia.org/wiki/Chord_names_and_symbols_(popular_music)
+-- | See [Wikipedia](https://en.wikipedia.org/wiki/Chord_names_and_symbols_(popular_music))
 allChords :: Array Chord
 allChords = 
   [ { name: ["maj", "major"], notes: [0, 4, 7], description: "major (C-E-G)" }
@@ -145,7 +146,7 @@ type Scale =
   }
 
 -- | Database of scales and modes
--- | See https://en.wikipedia.org/wiki/List_of_musical_scales_and_modes
+-- | See [Wikipedia](https://en.wikipedia.org/wiki/List_of_musical_scales_and_modes)
 allScales :: Array Scale
 allScales = 
   [ { name: ["major", "ionian", "I"], notes: [0, 2, 4, 5, 7, 9, 11], description: "Ionian mode (I) or major scale" }
@@ -181,6 +182,8 @@ type Options =
 -- -------------------------------
 -- Output functions
 
+-- Describe all the output structures.
+
 type AllNotesOutput = 
   { notes :: Array (Array String) 
   }
@@ -195,7 +198,8 @@ type ChordOutput =
   { chord :: String
   , notes :: Maybe (Array String)
   , transpose :: Int
-  , inversion :: Int }
+  , inversion :: Int 
+  }
 type AllScalesOutput = 
   { scales :: Array Scale 
   }
@@ -219,11 +223,13 @@ data Output
 
 -- -------------------------------
 
+-- | Return all the notes in the scale, including alternate names.
 getAllNotes :: AllNotesOutput
 getAllNotes = { notes: allNotes }
 
 -- -------------------------------
 
+-- | Return all the known chords, with their details.
 getAllChords :: AllChordsOutput
 getAllChords = { chords: allChords }
 
@@ -237,19 +243,20 @@ getChord rootNote chordName opts =
   , transpose: tr
   , inversion: inv
   }
-  where notes = f <$> chord
-        f = _.notes
-          >>> (map $ transpose (tr + rootNum))
-          >>> (rotateLeft inv)
-          >>> (map $ numToNote allNotes)
-          >>> (map $ collapseNotes rootNote)
-        chord = findItemByName chordName allChords
-        tr = opts.transpose
-        inv = opts.inversion
-        rootNum = fromMaybe 0 $ noteToNum allNotes rootNote
+  where notes = f <$> chord                     -- :: Maybe (Array String)
+        f = _.notes                             -- :: Chord -> Array Int
+          >>> (map $ transpose (tr + rootNum))  -- :: Array Int
+          >>> (rotateLeft inv)                  -- :: Array Int
+          >>> (map $ numToNote allNotes)        -- :: Array (Array String)
+          >>> (map $ collapseNotes rootNote)    -- :: Array String
+        chord = findItemByName chordName allChords :: Maybe Chord
+        tr = opts.transpose :: Int
+        inv = opts.inversion :: Int
+        rootNum = fromMaybe 0 $ noteToNum allNotes rootNote -- :: Int
 
 -- -------------------------------
 
+-- | Return all the known scales and modes.
 getAllScales :: AllScalesOutput
 getAllScales = { scales: allScales }
 
