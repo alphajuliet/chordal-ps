@@ -2212,7 +2212,7 @@ var PS = {};
               if (Data_Boolean.otherwise) {
                   return Data_Array.head(lst);
               };
-              throw new Error("Failed pattern match at Chordal (line 82, column 9 - line 83, column 33): " + [  ]);
+              throw new Error("Failed pattern match at Chordal (line 83, column 9 - line 84, column 33): " + [  ]);
           })();
           return Data_Maybe.fromMaybe("")(x);
       };
@@ -4013,8 +4013,6 @@ var PS = {};
   var Data_String_Common = PS["Data.String.Common"];
   var Data_String_Pattern = PS["Data.String.Pattern"];
   var Data_Symbol = PS["Data.Symbol"];
-  var Effect = PS["Effect"];
-  var Effect_Console = PS["Effect.Console"];
   var Prelude = PS["Prelude"];
   var Routing = PS["Routing"];
   var Routing_Match = PS["Routing.Match"];
@@ -4107,7 +4105,7 @@ var PS = {};
       if (v instanceof Note) {
           return "Note " + v.value0;
       };
-      throw new Error("Failed pattern match at Router (line 43, column 1 - line 43, column 36): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Router (line 41, column 1 - line 41, column 36): " + [ v.constructor.name ]);
   });
   var options = function (p) {
       var tr = stringToInt(Data_Map_Internal.lookup(Data_Ord.ordString)("transpose")(p));
@@ -4183,7 +4181,7 @@ var PS = {};
               error: "Route error"
           });
       };
-      throw new Error("Failed pattern match at Router (line 91, column 11 - line 98, column 65): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Router (line 89, column 11 - line 96, column 76): " + [ v.constructor.name ]);
   };
   exports["route"] = route;
 })(PS["Router"] = PS["Router"] || {});module.exports = PS["Router"];

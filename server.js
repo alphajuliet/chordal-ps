@@ -6,6 +6,7 @@ const fs = require('fs'),
   express = require('express'),
   app = express(),
   url = require('url'),
+  md = require('markdown-it')(),
   C = require('./dist/Router')
 
 // -------------------------------
